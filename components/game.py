@@ -17,6 +17,10 @@ class Game:
         return player
 
     def make_move(self, player_number=None):
+        player = self.next_player() if not player_number else player_number
+        player = self.players[player]
+        proposed_board = player.choose_piece(self.board)
+        # compare boards
         pass
 
     def over(self):

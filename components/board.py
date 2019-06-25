@@ -17,10 +17,19 @@ class Board:
         self.board = np.array([[None] * self.dim] * self.dim, dtype=Piece)
         pass
 
+    def __eq__(self, other):
+        dim = self.dim == other.dim
+        move_count = self.move_count == other.move_count
+        if len(self.pool) != len(other.pool):
+            return False
+        pool = np.equal(self.pool, other.pool).all()
+        board = np.equal(self.board, other.board).all()
+        return dim and move_count and pool and board
+
     def piece_in_pool(self, color, height, indent, shape):
         comparison_piece = Piece(color, height, indent, shape)
         for pi in self.pool:
-            if Piece.equal(pi, comparison_piece):
+            if pi == comparison_piece:
                 return True
         return False
 
@@ -30,7 +39,7 @@ class Board:
             return False
         pi_to_place = None
         for pi in self.pool:
-            if Piece.equal(pi, Piece(color, height, indent, shape)):
+            if pi == Piece(color, height, indent, shape):
                 self.pool.remove(pi)
                 pi_to_place = pi
                 break
@@ -98,6 +107,15 @@ class TestBoard(unittest.TestCase):
         self.board.place_piece(0, 0, 1, 0, x=2, y=0)
         self.board.place_piece(0, 0, 1, 1, x=3, y=0)
         self.assertTrue(self.board.check_finished())
+        pass
+
+    def test_equal(self):
+        board_a = Board()
+        board_b = Board()
+
+        self.assertTrue(board_a == board_b)
+        board_a.place_piece(0, 0, 0, 1, 0, 1)
+        self.assertFalse(board_a == board_b)
         pass
 
 

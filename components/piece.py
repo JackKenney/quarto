@@ -21,6 +21,11 @@ class Piece:
 
         self.attributes = np.array([color, height, indent, shape])
 
+    def __eq__(self, other):
+        if all(self.attributes == other.attributes):
+            return True
+        return False
+
     @classmethod
     def matching_set(cls, piece_array):
         try:
@@ -32,12 +37,6 @@ class Piece:
         for attribute in total:
             if attribute == len(piece_array) or attribute == 0:
                 return True
-        return False
-
-    @classmethod
-    def equal(cls, pi_a, pi_b):
-        if all(pi_a.attributes == pi_b.attributes):
-            return True
         return False
 
 
