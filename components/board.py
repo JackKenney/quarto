@@ -7,6 +7,7 @@ from piece import Piece
 class Board:
     def __init__(self):
         self.dim = 4
+        self.move_count = 0
         self.pool = []
         for color in range(2):
             for height in range(2):
@@ -34,9 +35,13 @@ class Board:
                 pi_to_place = pi
                 break
         self.board[x][y] = pi_to_place
+        self.move_count += 1
         return True
 
     def check_finished(self):
+        # moves
+        if self.move_count == self.dim ** 2:
+            return True
         # rows
         for row in range(self.dim):
             if Piece.matching_set(self.board[row]):
@@ -83,6 +88,7 @@ class TestBoard(unittest.TestCase):
     def test_place_piece(self):
         self.board.place_piece(0, 0, 0, 0, x=0, y=0)
         self.assertTrue(self.board.board[0][0])
+        self.assertEqual(self.board.move_count, 1)
         pass
 
     def test_check_finished(self):
