@@ -12,14 +12,11 @@ class Piece:
     FLAT = 0
     HOLE = 1
 
-    def __init__(self, color, height, indent, shape):
+    def __init__(self, attrs):
         accepted = [0, 1]
-        assert color in accepted
-        assert shape in accepted
-        assert height in accepted
-        assert indent in accepted
-
-        self.attributes = np.array([color, height, indent, shape])
+        assert len(attrs) == 4
+        assert all([attr in accepted for attr in attrs])
+        self.attributes = np.array(attrs)
 
     def __eq__(self, other):
         if all(self.attributes == other.attributes):
@@ -47,13 +44,11 @@ import unittest
 
 class TestPiece(unittest.TestCase):
     def setUp(self):
-        self.piece = Piece(0, 0, 0, 0)
+        self.piece = Piece([0, 0, 0, 0])
         pass
 
     def test_attributes(self):
-        pi = Piece(
-            color=Piece.DARK, height=Piece.SHORT, indent=Piece.FLAT, shape=Piece.ROUND
-        )
+        pi = Piece([Piece.DARK, Piece.SHORT, Piece.FLAT, Piece.ROUND])
         self.assertEqual(pi.attributes[0], 0)
         self.assertEqual(pi.attributes[1], 0)
         self.assertEqual(pi.attributes[2], 0)
@@ -61,12 +56,12 @@ class TestPiece(unittest.TestCase):
         pass
 
     def test_equal(self):
-        a = Piece(0, 0, 0, 0)
-        b = Piece(0, 0, 0, 0)
-        c = Piece(0, 0, 0, 1)
-        self.assertTrue(Piece.equal(a, b))
-        self.assertFalse(Piece.equal(a, c))
-        self.assertFalse(Piece.equal(b, c))
+        a = Piece([0, 0, 0, 0])
+        b = Piece([0, 0, 0, 0])
+        c = Piece([0, 0, 0, 1])
+        self.assertTrue(a == b)
+        self.assertFalse(a == c)
+        self.assertFalse(b == c)
         pass
 
     def test_matching_set(self):
@@ -74,14 +69,16 @@ class TestPiece(unittest.TestCase):
         for color in range(2):
             for height in range(2):
                 for indent in range(2):
-                    matching_pieces.append(Piece(color, height, indent, 0))
+                    matching_pieces.append(Piece([color, height, indent, 0]))
         self.assertTrue(Piece.matching_set(matching_pieces))
         matching_pieces.append(None)
         self.assertFalse(Piece.matching_set(matching_pieces))
+        pass
 
+    def test_mismatched_set(self):
         mismatched_pieces = []
         for attr in range(2):
-            mismatched_pieces.append(Piece(attr, attr, attr, attr))
+            mismatched_pieces.append(Piece([attr, attr, attr, attr]))
         self.assertFalse(Piece.matching_set(mismatched_pieces))
         pass
 

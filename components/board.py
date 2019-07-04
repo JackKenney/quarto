@@ -13,7 +13,7 @@ class Board:
             for height in range(2):
                 for indent in range(2):
                     for shape in range(2):
-                        self.pool.append(Piece(color, height, indent, shape))
+                        self.pool.append(Piece([color, height, indent, shape]))
         self.board = np.array([[None] * self.dim] * self.dim, dtype=Piece)
         pass
 
@@ -26,24 +26,33 @@ class Board:
         board = np.equal(self.board, other.board).all()
         return dim and move_count and pool and board
 
-    def piece_in_pool(self, color, height, indent, shape):
-        comparison_piece = Piece(color, height, indent, shape)
+    def piece_in_pool(self, attrs):
+        comparison_piece = Piece(attrs)
         for pi in self.pool:
             if pi == comparison_piece:
                 return True
         return False
 
-    def place_piece(self, color, height, indent, shape, x, y):
-        """Returns true if piece placed successfully false if piece unavailable."""
-        if not self.piece_in_pool(color, height, indent, shape):
+    def location_open(self, location):
+        return not self.board[location]
+
+    def place_piece(self, attrs, location):
+        """
+        Returns true if piece placed successfully false if piece unavailable.
+
+        Params:
+        * attrs: [color, height, indent, shape] 
+        * location: [x, y]
+        """
+        if not self.piece_in_pool(attrs):
             return False
         pi_to_place = None
         for pi in self.pool:
-            if pi == Piece(color, height, indent, shape):
+            if pi == Piece(attrs):
                 self.pool.remove(pi)
                 pi_to_place = pi
                 break
-        self.board[x][y] = pi_to_place
+        self.board[location[0]][location[1]] = pi_to_place
         self.move_count += 1
         return True
 
@@ -77,6 +86,7 @@ import unittest
 class TestBoard(unittest.TestCase):
     def setUp(self):
         self.board = Board()
+        self.basic_attrs = [0,0,0,0]
         pass
 
     def test_init(self):
@@ -87,25 +97,31 @@ class TestBoard(unittest.TestCase):
         pass
 
     def test_piece_in_pool(self):
-        self.assertTrue(self.board.piece_in_pool(0, 0, 0, 0))
+        self.assertTrue(self.board.piece_in_pool(self.basic_attrs))
         temp = self.board.pool[0]
         self.board.pool = self.board.pool[1:]
-        self.assertFalse(self.board.piece_in_pool(0, 0, 0, 0))
+        self.assertFalse(self.board.piece_in_pool(self.basic_attrs))
         self.board.pool = [temp] + self.board.pool
         pass
 
+    def test_location_open(self):
+        self.assertTrue(self.board.location_open((0,0)))
+        self.board.place_piece([0,0,0,0], [0,0])
+        self.assertFalse(self.board.location_open((0,0)))
+        pass
+
     def test_place_piece(self):
-        self.board.place_piece(0, 0, 0, 0, x=0, y=0)
+        self.board.place_piece(self.basic_attrs, (0, 0))
         self.assertTrue(self.board.board[0][0])
         self.assertEqual(self.board.move_count, 1)
         pass
 
     def test_check_finished(self):
         self.assertFalse(self.board.check_finished())
-        self.board.place_piece(0, 0, 0, 0, x=0, y=0)
-        self.board.place_piece(0, 0, 0, 1, x=1, y=0)
-        self.board.place_piece(0, 0, 1, 0, x=2, y=0)
-        self.board.place_piece(0, 0, 1, 1, x=3, y=0)
+        self.board.place_piece([0, 0, 0, 0], [0,0])
+        self.board.place_piece([0, 0, 0, 1], [1,0])
+        self.board.place_piece([0, 0, 1, 0], [2,0])
+        self.board.place_piece([0, 0, 1, 1], [3,0])
         self.assertTrue(self.board.check_finished())
         pass
 
@@ -114,7 +130,7 @@ class TestBoard(unittest.TestCase):
         board_b = Board()
 
         self.assertTrue(board_a == board_b)
-        board_a.place_piece(0, 0, 0, 1, 0, 1)
+        board_a.place_piece([0, 0, 0, 1], [0, 1])
         self.assertFalse(board_a == board_b)
         pass
 

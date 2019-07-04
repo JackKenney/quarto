@@ -19,8 +19,12 @@ class Game:
     def make_move(self, player_number=None):
         player = self.next_player() if not player_number else player_number
         player = self.players[player]
-        proposed_board = player.choose_piece(self.board)
+        (piece_attrs, location) = player.choose_piece(self.board)
         # compare boards
+        in_pool = self.board.piece_in_pool(piece_attrs)
+        location_open = self.board.location_open(location)
+        if in_pool and location_open:
+            self.board.place_piece(piece_attrs, location)
         pass
 
     def over(self):
