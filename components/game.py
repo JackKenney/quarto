@@ -19,16 +19,19 @@ class Game:
     def make_move(self, player_number=None):
         player = self.next_player() if not player_number else player_number
         player = self.players[player]
-        (piece_attrs, location) = player.choose_piece(self.board)
-        # compare boards
-        in_pool = self.board.piece_in_pool(piece_attrs)
-        location_open = self.board.location_open(location)
-        if in_pool and location_open:
-            self.board.place_piece(piece_attrs, location)
-        pass
+        valid_move = False
+        while not valid_move:
+            (piece_attrs, location) = player.choose_piece(self.board)
+            # compare boards
+            in_pool = self.board.piece_in_pool(piece_attrs)
+            location_open = self.board.location_open(location)
+            if in_pool and location_open:
+                placed = self.board.place_piece(piece_attrs, location)
+                if placed:
+                    valid_move = True
 
-    def over(self):
-        pass
+        if self.board.game_over():
+            self.winner = player_number
 
 
 ######################################################################################
@@ -61,8 +64,8 @@ class TestGame(unittest.TestCase):
             self.game.make_move(player)
             self.assertEqual(self.game.board.move_count, move + 1)
             player = 1 if player == 0 else 0
-        self.assertTrue(self.game.over())
-        print(self.game.winner)
+        self.assertTrue(self.game.winner)
+        print("Winner is player", self.game.winner)
         pass
 
 

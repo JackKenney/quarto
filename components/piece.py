@@ -36,6 +36,13 @@ class Piece:
                 return True
         return False
 
+    def print(self):
+        string = ""
+        for attr in self.attributes:
+            string += repr(attr)
+        print(string, end=" ")
+        pass
+
 
 ######################################################################################
 

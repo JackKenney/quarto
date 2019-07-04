@@ -34,7 +34,7 @@ class Board:
         return False
 
     def location_open(self, location):
-        return not self.board[location]
+        return not self.board[location[0]][location[1]]
 
     def place_piece(self, attrs, location):
         """
@@ -44,7 +44,7 @@ class Board:
         * attrs: [color, height, indent, shape] 
         * location: [x, y]
         """
-        if not self.piece_in_pool(attrs):
+        if not self.piece_in_pool(attrs) or not self.location_open(location):
             return False
         pi_to_place = None
         for pi in self.pool:
@@ -56,7 +56,7 @@ class Board:
         self.move_count += 1
         return True
 
-    def check_finished(self):
+    def game_over(self):
         # moves
         if self.move_count == self.dim ** 2:
             return True
@@ -77,6 +77,18 @@ class Board:
         # failure
         return False
 
+    def print(self):
+        print("Board:")
+        for x in range(4):
+            for y in range(4):
+                item = self.board[x, y]
+                if item:
+                    item.print()
+                else:
+                    print("____", end=" ")
+            print()
+        pass
+
 
 ######################################################################################
 
@@ -86,7 +98,7 @@ import unittest
 class TestBoard(unittest.TestCase):
     def setUp(self):
         self.board = Board()
-        self.basic_attrs = [0,0,0,0]
+        self.basic_attrs = [0, 0, 0, 0]
         pass
 
     def test_init(self):
@@ -105,9 +117,9 @@ class TestBoard(unittest.TestCase):
         pass
 
     def test_location_open(self):
-        self.assertTrue(self.board.location_open((0,0)))
-        self.board.place_piece([0,0,0,0], [0,0])
-        self.assertFalse(self.board.location_open((0,0)))
+        self.assertTrue(self.board.location_open((0, 0)))
+        self.board.place_piece([0, 0, 0, 0], [0, 0])
+        self.assertFalse(self.board.location_open((0, 0)))
         pass
 
     def test_place_piece(self):
@@ -116,13 +128,13 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(self.board.move_count, 1)
         pass
 
-    def test_check_finished(self):
-        self.assertFalse(self.board.check_finished())
-        self.board.place_piece([0, 0, 0, 0], [0,0])
-        self.board.place_piece([0, 0, 0, 1], [1,0])
-        self.board.place_piece([0, 0, 1, 0], [2,0])
-        self.board.place_piece([0, 0, 1, 1], [3,0])
-        self.assertTrue(self.board.check_finished())
+    def test_game_over(self):
+        self.assertFalse(self.board.game_over())
+        self.board.place_piece([0, 0, 0, 0], [0, 0])
+        self.board.place_piece([0, 0, 0, 1], [1, 0])
+        self.board.place_piece([0, 0, 1, 0], [2, 0])
+        self.board.place_piece([0, 0, 1, 1], [3, 0])
+        self.assertTrue(self.board.game_over())
         pass
 
     def test_equal(self):
@@ -132,6 +144,13 @@ class TestBoard(unittest.TestCase):
         self.assertTrue(board_a == board_b)
         board_a.place_piece([0, 0, 0, 1], [0, 1])
         self.assertFalse(board_a == board_b)
+        pass
+
+    def test_print(self):
+        self.board.print()
+        self.board.board = np.array(self.board.pool).reshape((4, 4))
+        self.board.pool = np.array([])
+        self.board.print()
         pass
 
 
