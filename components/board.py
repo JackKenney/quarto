@@ -77,6 +77,14 @@ class Board:
         # failure
         return False
 
+    def list_empty_locations(self):
+        empty = []
+        for x in range(self.dim):
+            for y in range(self.dim):
+                if not self.board[x][y]:
+                    empty.append((x, y))
+        return empty
+
     def print(self):
         print("Board:")
         for x in range(4):
@@ -88,6 +96,15 @@ class Board:
                     print("____", end=" ")
             print()
         pass
+
+    def copy(self):
+        cp = Board()
+        for x in range(self.dim):
+            for y in range(self.dim):
+                pi = self.board[x][y]
+                if pi:
+                    cp.place_piece(pi.attrs, (x, y))
+        return cp
 
 
 ######################################################################################
@@ -151,6 +168,19 @@ class TestBoard(unittest.TestCase):
         self.board.board = np.array(self.board.pool).reshape((4, 4))
         self.board.pool = np.array([])
         self.board.print()
+        pass
+
+    def test_copy(self):
+        cp = self.board.copy()
+        self.assertEqual(cp, self.board)
+        cp.place_piece([1, 0, 0, 0], (1, 1))
+        self.assertNotEqual(cp, self.board)
+        pass
+
+    def test_list_empty_locations(self):
+        expected = [(x, y) for x in range(4) for y in range(4)]
+        actual = self.board.list_empty_locations()
+        self.assertEqual(expected, actual)
         pass
 
 
