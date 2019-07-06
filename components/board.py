@@ -103,7 +103,7 @@ class Board:
             for y in range(self.dim):
                 pi = self.board[x][y]
                 if pi:
-                    cp.place_piece(pi.attrs, (x, y))
+                    cp.place_piece(pi.attributes, (x, y))
         return cp
 
 
