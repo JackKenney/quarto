@@ -77,7 +77,7 @@ class Board:
         # failure
         return False
 
-    def list_empty_locations(self):
+    def empty_locations(self):
         empty = []
         for x in range(self.dim):
             for y in range(self.dim):
@@ -179,7 +179,7 @@ class TestBoard(unittest.TestCase):
 
     def test_list_empty_locations(self):
         expected = [(x, y) for x in range(4) for y in range(4)]
-        actual = self.board.list_empty_locations()
+        actual = self.board.empty_locations()
         self.assertEqual(expected, actual)
         pass
 
