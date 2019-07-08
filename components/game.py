@@ -16,12 +16,13 @@ class Game:
             player = 0
         return player
 
-    def make_move(self, player_number=None):
-        player = self.next_player() if not player_number else player_number
-        player = self.players[player]
+    def make_move(self):
+        placer = self.players[self.last_player]
+        picker = self.players[self.next_player()]
         valid_move = False
         while not valid_move:
-            (piece_attrs, location) = player.choose_piece(self.board)
+            piece_attrs = picker.choose_piece(self.board)
+            location = placer.choose_location(self.board, piece_attrs)
             # compare boards
             in_pool = self.board.piece_in_pool(piece_attrs)
             location_open = self.board.location_open(location)
@@ -31,7 +32,7 @@ class Game:
                     valid_move = True
 
         if self.board.game_over():
-            self.winner = player_number
+            self.winner = self.last_player
 
 
 ######################################################################################
@@ -58,12 +59,10 @@ class TestGame(unittest.TestCase):
         pass
 
     def test_full_game(self):
-        player = 0
         for move in range(16):
             self.assertEqual(self.game.board.move_count, move)
-            self.game.make_move(player)
+            self.game.make_move()
             self.assertEqual(self.game.board.move_count, move + 1)
-            player = 1 if player == 0 else 0
         self.assertTrue(self.game.winner)
         print("Winner is player", self.game.winner)
         pass
